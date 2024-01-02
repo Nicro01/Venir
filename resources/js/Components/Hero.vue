@@ -356,6 +356,7 @@ export default {
                         data-te-ripple-init
                         :href="this.selectedVideoInfo['url']"
                         target="_blank"
+                        download
                     >
                         DOWNLOAD
                     </a>
