@@ -8,7 +8,7 @@ export default {
         return {
             url: "",
             video: "",
-            info: { 0: { 0: {} }, 1: { 0: {} } },
+            info: {},
             selectedVideo: "",
             selectedVideoInfo: {},
             videoLoaded: false,
@@ -26,7 +26,12 @@ export default {
     },
     methods: {
         _mediaSelected(newValue) {
-            this.mediaSelected = newValue;
+            if (newValue == this.mediaSelected) {
+                return (this.videoLoaded = true);
+            } else {
+                this.mediaSelected = newValue;
+                return (this.videoLoaded = false);
+            }
         },
         getEmbedUrl() {
             let videoId = this.url.split("v=")[1];
@@ -36,7 +41,7 @@ export default {
             }
             this.video = "https://www.youtube.com/embed/" + videoId;
         },
-        async download() {
+        async youtube() {
             this.isLoading = true;
             await axios
                 .get("/youtube", { params: { url: this.url } })
@@ -51,6 +56,51 @@ export default {
             this.getEmbedUrl();
             this.selectedVideoInfo = this.info[0][0];
             this.videoLoaded = true;
+        },
+        async reels() {
+            this.isLoading = true;
+            await axios
+                .get("/instagram", { params: { url: this.url } })
+                .then((response) => {
+                    console.log(response);
+                    this.info = response.data[0].items;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+
+            this.video = this.url;
+            this.videoLoaded = true;
+        },
+        async tiktok() {
+            this.isLoading = true;
+            await axios
+                .get("/tiktok", { params: { url: this.url } })
+                .then((response) => {
+                    console.log(response);
+                    this.info = response.data;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+
+            this.video = this.info.videoUrl;
+            this.videoLoaded = true;
+        },
+        download() {
+            switch (this.mediaSelected) {
+                case 1:
+                    this.youtube();
+                    break;
+                case 2:
+                    this.reels();
+                    break;
+                case 3:
+                    this.tiktok();
+                    break;
+                default:
+                    break;
+            }
         },
     },
 };
@@ -72,13 +122,16 @@ export default {
                         Online Video Downloader
                     </h2>
                     <p class="text-lg text-neutral-500 dark:text-neutral-300">
-                        Redefining video downloads for YouTube, Twitter, and
-                        Instagram. Experience unparalleled simplicity and speed
-                        in one powerful platform!
+                        Redefining video downloads for YouTube, Twitter,
+                        Facebook, and Instagram Reels and Photos. Experience
+                        unparalleled simplicity and speed in one powerful
+                        platform!
                     </p>
                 </div>
                 <div class="max-w-[800px]">
-                    <div class="relative flex flex-wrap items-stretch">
+                    <div
+                        class="relative flex flex-wrap items-stretch sm:w-[400px]"
+                    >
                         <input
                             type="text"
                             v-model="url"
@@ -143,7 +196,7 @@ export default {
                         </button>
                         <button @click="_mediaSelected(3)">
                             <img
-                                src="https://i.postimg.cc/D0WKWwc2/twitter.png"
+                                src="https://i.postimg.cc/26LLgJfz/tiktok.png"
                                 alt=""
                                 class="w-12 h-12"
                                 :class="
@@ -172,6 +225,7 @@ export default {
                 </div>
 
                 <div
+                    v-if="videoLoaded && mediaSelected == 1"
                     :key="videoLoaded"
                     id="manually-example"
                     class="max-w-[1200px] mt-10"
@@ -179,8 +233,6 @@ export default {
                     data-te-animation-start="manually"
                     data-te-animation-reset="true"
                     data-te-animation="[browse-in_0.5s]"
-                    v-show="videoLoaded"
-                    v-else
                 >
                     <div
                         class="origin-[center_center] mx-auto grid gap-20 grid-cols-1 sm:grid-cols-3 sm:w-full items-center justify-center"
@@ -283,6 +335,212 @@ export default {
                         :href="this.selectedVideoInfo['url']"
                         target="_blank"
                         download
+                    >
+                        DOWNLOAD
+                    </a>
+                </div>
+                <div
+                    v-if="videoLoaded && mediaSelected == 2"
+                    :key="videoLoaded"
+                    id="manually-example"
+                    class="max-w-[1200px] mt-10"
+                    data-te-animation-init
+                    data-te-animation-start="manually"
+                    data-te-animation-reset="true"
+                    data-te-animation="[browse-in_0.5s]"
+                >
+                    <div
+                        class="origin-[center_center] mx-auto grid gap-20 grid-cols-1 sm:grid-cols-3 sm:w-full items-center justify-center"
+                    >
+                        <div class="col-span-1">
+                            <video controls class="rounded-lg shadow-lg">
+                                <source
+                                    :src="this.info[0].video_versions[0].url"
+                                    type="video/webm"
+                                />
+                            </video>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="flex flex-col gap-2 mb-10">
+                                <span
+                                    class="text-sm text-neutral-500 dark:text-neutral-300"
+                                >
+                                    User
+                                </span>
+                                <span
+                                    class="text-lg text-neutral-700 dark:text-neutral-200"
+                                >
+                                    @{{ this.info[0].user.username }}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Full Name
+                                    </span>
+                                    <span
+                                        class="text-lg text-neutral-700 dark:text-neutral-200"
+                                    >
+                                        {{ this.info[0].user.full_name }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Description
+                                    </span>
+                                    <p
+                                        class="text-lg text-neutral-700 dark:text-neutral-200 text-ellipsis overflow-hidden max-h-20"
+                                    >
+                                        {{ this.info[0].caption.text }}
+                                    </p>
+                                    <span
+                                        class="text-sm text-neutral-400 dark:text-neutral-300 cursor-pointer"
+                                    >
+                                        see more
+                                    </span>
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Views
+                                    </span>
+                                    <span
+                                        class="text-lg text-neutral-700 dark:text-neutral-200"
+                                    >
+                                        {{ this.info[0].view_count }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Likes
+                                    </span>
+                                    <span
+                                        class="text-lg text-neutral-700 dark:text-neutral-200"
+                                    >
+                                        {{ this.info[0].like_count }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a
+                        type="button"
+                        class="inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                        data-te-ripple-init
+                        :href="this.info[0].video_versions[0].url"
+                        target="_blank"
+                        :download="`${this.info[0].user.username}.mp4`"
+                    >
+                        DOWNLOAD
+                    </a>
+                </div>
+                <div
+                    v-if="videoLoaded && mediaSelected == 3"
+                    :key="videoLoaded"
+                    id="manually-example"
+                    class="max-w-[1200px] mt-10"
+                    data-te-animation-init
+                    data-te-animation-start="manually"
+                    data-te-animation-reset="true"
+                    data-te-animation="[browse-in_0.5s]"
+                >
+                    <div
+                        class="origin-[center_center] mx-auto grid gap-20 grid-cols-1 sm:grid-cols-3 sm:w-full items-center justify-center"
+                    >
+                        <div class="col-span-1">
+                            <video controls class="rounded-lg shadow-lg">
+                                <source
+                                    :src="this.info.data.wmplay"
+                                    type="video/webm"
+                                />
+                            </video>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="flex flex-col gap-2 mb-10">
+                                <span
+                                    class="text-sm text-neutral-500 dark:text-neutral-300"
+                                >
+                                    User
+                                </span>
+                                <span
+                                    class="text-lg text-neutral-700 dark:text-neutral-200"
+                                >
+                                    @{{ this.info.data.author.unique_id }}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Full Name
+                                    </span>
+                                    <span
+                                        class="text-lg text-neutral-700 dark:text-neutral-200"
+                                    >
+                                        {{ this.info.data.author.nickname }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Description
+                                    </span>
+                                    <p
+                                        class="text-lg text-neutral-700 dark:text-neutral-200 text-ellipsis overflow-hidden max-h-20"
+                                    >
+                                        {{ this.info.data.title }}
+                                    </p>
+                                    <span
+                                        class="text-sm text-neutral-400 dark:text-neutral-300 cursor-pointer"
+                                    >
+                                        see more
+                                    </span>
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Views
+                                    </span>
+                                    <span
+                                        class="text-lg text-neutral-700 dark:text-neutral-200"
+                                    >
+                                        {{ this.info.data.play_count }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <span
+                                        class="text-sm text-neutral-500 dark:text-neutral-300"
+                                    >
+                                        Shares
+                                    </span>
+                                    <span
+                                        class="text-lg text-neutral-700 dark:text-neutral-200"
+                                    >
+                                        {{ this.info.data.share_count }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a
+                        type="button"
+                        class="inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                        data-te-ripple-init
+                        :href="`${this.info.data.hdplay}.mp4`"
+                        target="_blank"
+                        :download="`${this.info.data.hdplay}.mp4`"
                     >
                         DOWNLOAD
                     </a>
