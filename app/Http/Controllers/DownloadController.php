@@ -17,7 +17,7 @@ class DownloadController extends Controller
 
         $links = $yt->getDownloadLinks($request->url);
 
-        $links = $links->getVideoFormats();
+        $links = $links->getAllFormats();
 
         $info = $yt->getVideoInfo($request->url);
 

@@ -320,7 +320,29 @@ export default {
                                                 :key="index"
                                                 :value="index"
                                             >
-                                                {{ info["qualityLabel"] }}
+                                                <span
+                                                    v-if="
+                                                        info.audioQuality !=
+                                                            null &&
+                                                        info.qualityLabel !=
+                                                            null
+                                                    "
+                                                    >{{
+                                                        info.qualityLabel
+                                                    }}</span
+                                                >
+                                                <span
+                                                    v-else-if="
+                                                        info.qualityLabel !=
+                                                        null
+                                                    "
+                                                    >{{ info.qualityLabel }} No
+                                                    Audio</span
+                                                >
+                                                <span v-else
+                                                    >{{ info.quality }} Only
+                                                    Audio</span
+                                                >
                                             </option>
                                         </select>
                                     </span>
@@ -334,7 +356,6 @@ export default {
                         data-te-ripple-init
                         :href="this.selectedVideoInfo['url']"
                         target="_blank"
-                        download
                     >
                         DOWNLOAD
                     </a>
