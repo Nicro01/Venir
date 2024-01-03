@@ -8,6 +8,7 @@ use YouTube\Exception\YouTubeException;
 use Sovit\TikTok\Api;
 use Exception;
 use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 
 class DownloadController extends Controller
 {
@@ -64,6 +65,26 @@ class DownloadController extends Controller
             return $tiktok->json();
         } catch (Exception $e) {
             return response()->json($e->getMessage());
+        }
+    }
+
+    public function downloadVideo(Request $request)
+    {
+        $videoUrl = $request->url;
+        $client = new Client();
+
+        try {
+            $response = $client->get($videoUrl);
+            $videoContent = $response->getBody()->getContents();
+
+            $response = response($videoContent, 200, [
+                'Content-Type' => 'application/octet-stream',
+                'Content-Disposition' => 'attachment; filename="video.mp4"',
+            ]);
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

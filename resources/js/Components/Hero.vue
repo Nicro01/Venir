@@ -102,6 +102,26 @@ export default {
                     break;
             }
         },
+        downloadVideo($url) {
+            axios("/download", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                params: {
+                    url: $url,
+                },
+                responseType: "blob",
+            }).then((response) => {
+                const url = window.URL.createObjectURL(response.data);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "video.mp4";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            });
+        },
     },
 };
 </script>
@@ -352,11 +372,10 @@ export default {
                     </div>
                     <a
                         type="button"
-                        class="inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                        class="cursor-pointer inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
                         data-te-ripple-init
-                        :href="this.selectedVideoInfo['url']"
+                        @click="downloadVideo(this.selectedVideoInfo.url)"
                         target="_blank"
-                        download
                     >
                         DOWNLOAD
                     </a>
@@ -455,11 +474,12 @@ export default {
                     </div>
                     <a
                         type="button"
-                        class="inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                        class="cursor-pointer inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
                         data-te-ripple-init
-                        :href="this.info[0].video_versions[0].url"
                         target="_blank"
-                        :download="`${this.info[0].user.username}.mp4`"
+                        @click="
+                            downloadVideo(this.info[0].video_versions[0].url)
+                        "
                     >
                         DOWNLOAD
                     </a>
@@ -560,9 +580,8 @@ export default {
                         type="button"
                         class="inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
                         data-te-ripple-init
-                        :href="`${this.info.data.hdplay}.mp4`"
                         target="_blank"
-                        :download="`${this.info.data.hdplay}.mp4`"
+                        @click="downloadVideo(this.info.data.hdplay)"
                     >
                         DOWNLOAD
                     </a>

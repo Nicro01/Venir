@@ -31,3 +31,5 @@ Route::get('/contact', function () {
 Route::get('/youtube', [DownloadController::class, 'youtubeDownload'])->name('youtube.download');
 Route::get('/instagram', [DownloadController::class, 'instagramDownload'])->name('instagram.download');
 Route::get('/tiktok', [DownloadController::class, 'tiktokDownload'])->name('tiktok.download');
+
+Route::get('/download', [DownloadController::class, 'downloadVideo'])->name('download');
