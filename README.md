@@ -6,15 +6,15 @@ This project is a web application that allows users to download videos from vari
 
 The application is built using a variety of technologies:
 
--   **Laravel:**
+-   **Laravel**
 
--   **Vue.js:**
+-   **Vue.js**
 
--   **Inertia.js:**
+-   **Inertia.js**
 
--   **Tailwind CSS:**
+-   **Tailwind CSS (TW Elements Plugin)**
 
--   **MySQL:**
+-   **MySQL**
 
 The project code is structured according to Laravel and Vue.js conventions, with server-side logic primarily located in the `app/` folder and client-side logic in the `resources/js/` folder.
 
