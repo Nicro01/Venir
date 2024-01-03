@@ -71,9 +71,7 @@
             class="w-full bg-neutral-300 p-4 text-center text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200"
         >
             © 2024 Copyright:
-            <a class="text-neutral-800 dark:text-neutral-400" href="#"
-                >WebGenie</a
-            >
+            <a class="text-neutral-800 dark:text-neutral-400" href="#">Venir</a>
         </div>
     </footer>
 </template>
