@@ -13,6 +13,8 @@ export default {
             selectedVideoInfo: {},
             videoLoaded: false,
             isLoading: false,
+            isDownloading: false,
+            successDownload: false,
             mediaSelected: 1,
         };
     },
@@ -22,6 +24,11 @@ export default {
     watch: {
         selectedVideo(newValue) {
             this.selectedVideoInfo = this.info[0][newValue];
+        },
+        successDownload(newValue) {
+            if (newValue) {
+                this.isDownloading = false;
+            }
         },
     },
     methods: {
@@ -103,6 +110,8 @@ export default {
             }
         },
         downloadVideo($url) {
+            this.isDownloading = true;
+            this.successDownload = false;
             axios("/download", {
                 method: "GET",
                 headers: {
@@ -112,15 +121,19 @@ export default {
                     url: $url,
                 },
                 responseType: "blob",
-            }).then((response) => {
-                const url = window.URL.createObjectURL(response.data);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "video.mp4";
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            });
+            })
+                .then((response) => {
+                    const url = window.URL.createObjectURL(response.data);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "video.mp4";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .finally(() => {
+                    this.successDownload = true;
+                });
         },
     },
 };
@@ -370,15 +383,53 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <a
-                        type="button"
-                        class="cursor-pointer inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
-                        data-te-ripple-init
-                        @click="downloadVideo(this.selectedVideoInfo.url)"
-                        target="_blank"
-                    >
-                        DOWNLOAD
-                    </a>
+                    <div class="flex gap-5 items-center justify-center mt-10">
+                        <a
+                            type="button"
+                            class="cursor-pointer inline-block px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                            data-te-ripple-init
+                            @click="downloadVideo(this.selectedVideoInfo.url)"
+                            target="_blank"
+                        >
+                            DOWNLOAD
+                        </a>
+                        <div
+                            v-show="isDownloading"
+                            class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                            role="status"
+                        >
+                            <span
+                                class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+                                >Loading...</span
+                            >
+                        </div>
+                        <div
+                            v-show="successDownload"
+                            data-te-animation-init
+                            data-te-animation-start="onHover"
+                            data-te-animation-reset="true"
+                            data-te-animation="[browse-in_0.5s]"
+                            class="flex justify-center items-center gap-2 text-green-600 dark:text-green-400"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1"
+                                stroke="currentColor"
+                                class="w-6 h-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+                                />
+                            </svg>
+                            <span class="text-xs select-none"
+                                >Success Downloaded</span
+                            >
+                        </div>
+                    </div>
                 </div>
                 <div
                     v-if="videoLoaded && mediaSelected == 2"
@@ -472,17 +523,58 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <a
-                        type="button"
-                        class="cursor-pointer inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
-                        data-te-ripple-init
-                        target="_blank"
-                        @click="
-                            downloadVideo(this.info[0].video_versions[0].url)
-                        "
-                    >
-                        DOWNLOAD
-                    </a>
+
+                    <div class="flex gap-5 items-center justify-center mt-10">
+                        <a
+                            type="button"
+                            class="cursor-pointer inline-block px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                            data-te-ripple-init
+                            target="_blank"
+                            @click="
+                                downloadVideo(
+                                    this.info[0].video_versions[0].url
+                                )
+                            "
+                        >
+                            DOWNLOAD
+                        </a>
+                        <div
+                            class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                            role="status"
+                            v-show="isDownloading"
+                        >
+                            <span
+                                class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+                                >Loading...</span
+                            >
+                        </div>
+                        <div
+                            v-show="successDownload"
+                            data-te-animation-init
+                            data-te-animation-start="onHover"
+                            data-te-animation-reset="true"
+                            data-te-animation="[browse-in_0.5s]"
+                            class="flex justify-center items-center gap-2 text-green-600 dark:text-green-400"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1"
+                                stroke="currentColor"
+                                class="w-6 h-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+                                />
+                            </svg>
+                            <span class="text-xs select-none"
+                                >Success Downloaded</span
+                            >
+                        </div>
+                    </div>
                 </div>
                 <div
                     v-if="videoLoaded && mediaSelected == 3"
@@ -576,15 +668,53 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <a
-                        type="button"
-                        class="inline-block mt-10 px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
-                        data-te-ripple-init
-                        target="_blank"
-                        @click="downloadVideo(this.info.data.hdplay)"
-                    >
-                        DOWNLOAD
-                    </a>
+                    <div class="flex gap-5 items-center justify-center mt-10">
+                        <a
+                            type="button"
+                            class="inline-block px-10 rounded border-2 border-success pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-success transition duration-150 ease-in-out hover:border-success-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-success-600 focus:border-success-600 focus:text-success-600 focus:outline-none focus:ring-0 active:border-success-700 active:text-success-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
+                            data-te-ripple-init
+                            target="_blank"
+                            @click="downloadVideo(this.info.data.hdplay)"
+                        >
+                            DOWNLOAD
+                        </a>
+                        <div
+                            class="inline-block h-5 w-5 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                            role="status"
+                            v-show="isDownloading"
+                        >
+                            <span
+                                class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+                                >Loading...</span
+                            >
+                        </div>
+                        <div
+                            v-show="successDownload"
+                            data-te-animation-init
+                            data-te-animation-start="onHover"
+                            data-te-animation-reset="true"
+                            data-te-animation="[browse-in_0.5s]"
+                            class="flex justify-center items-center gap-2 text-green-600 dark:text-green-400"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1"
+                                stroke="currentColor"
+                                class="w-6 h-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+                                />
+                            </svg>
+                            <span class="text-xs select-none"
+                                >Success Downloaded</span
+                            >
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
