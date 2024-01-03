@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.postimg.cc/D03XDLPm/Venir-Vectorized.png" alt="Logo">
+  <img src="https://i.postimg.cc/7YDBJ2rx/Venir-Vectorized.png" alt="Logo">
 </p>
 
 This project is a web application that allows users to download videos from various social media platforms such as Instagram Reels, TikTok, and YouTube (for now). The goal is to expand social media options in the future to include other platforms like Twitter (or X).
