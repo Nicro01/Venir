@@ -38,7 +38,7 @@ class DownloadController extends Controller
                 'shortcode' => $reelsId,
                 'response_type' => 'reels'
             ])->withHeaders([
-                'X-RapidAPI-Key' => '6ef8a43c79msh27786a55139ba01p128c62jsn232fa4a4948d',
+                'X-RapidAPI-Key' => env('RAPID_API_KEY'),
                 'X-RapidAPI-Host' => 'instagram-bulk-profile-scrapper.p.rapidapi.com'
             ])->get('{+endpoint}?shortcode={shortcode}&response_type={response_type}');
 
@@ -58,7 +58,7 @@ class DownloadController extends Controller
                 'url' => $url,
                 'hd' => '1'
             ])->withHeaders([
-                'X-RapidAPI-Key' => '6ef8a43c79msh27786a55139ba01p128c62jsn232fa4a4948d',
+                'X-RapidAPI-Key' => env('RAPID_API_KEY'),
                 'X-RapidAPI-Host' => 'tiktok-scraper7.p.rapidapi.com'
             ])->get('{+endpoint}?url={url}&hd={hd}');
 
