@@ -5,7 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+
+use Illuminate\Http\Response;
 
 class ForceHttps
 {
@@ -20,6 +21,14 @@ class ForceHttps
             return redirect()->secure($request->getRequestUri());
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        if ($response instanceof \Illuminate\Http\Response) {
+            return $response
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        }
+
+        return $response;
     }
 }
