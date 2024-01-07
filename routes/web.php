@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DownloadController;
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,22 +19,21 @@ use Inertia\Inertia;
 
 
 
-Route::group(['middleware' => ['cors']], function () {
-    Route::get('/', function () {
-        return Inertia::render('Welcome');
-    })->name('welcome');
 
-    Route::get('/faq', function () {
-        return Inertia::render('FAQ');
-    })->name('faq');
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+})->name('welcome');
 
-    Route::get('/contact', function () {
-        return Inertia::render('Contact');
-    })->name('contact');
+Route::get('/faq', function () {
+    return Inertia::render('FAQ');
+})->name('faq');
 
-    Route::get('/youtube', [DownloadController::class, 'youtubeDownload'])->name('youtube.download');
-    Route::get('/instagram', [DownloadController::class, 'instagramDownload'])->name('instagram.download');
-    Route::get('/tiktok', [DownloadController::class, 'tiktokDownload'])->name('tiktok.download');
+Route::get('/contact', function () {
+    return Inertia::render('Contact');
+})->name('contact');
 
-    Route::get('/download', [DownloadController::class, 'downloadVideo'])->name('download');
-});
+Route::get('/youtube', [DownloadController::class, 'youtubeDownload'])->name('youtube.download');
+Route::get('/instagram', [DownloadController::class, 'instagramDownload'])->name('instagram.download');
+Route::get('/tiktok', [DownloadController::class, 'tiktokDownload'])->name('tiktok.download');
+
+Route::get('/download', [DownloadController::class, 'downloadVideo'])->name('download');

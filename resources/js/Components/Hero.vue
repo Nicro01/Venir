@@ -143,7 +143,7 @@ export default {
         <!-- Section: Design Block -->
         <section class="mb-32 text-center">
             <div class="flex flex-col gap-10 items-center">
-                <div class="max-w-[800px]">
+                <div class="max-w-[800px] select-none">
                     <h2
                         class="mb-12 text-4xl text-neutral-600 font-extrabold tracking-tight md:text-4xl xl:text-5xl"
                     >
@@ -156,7 +156,7 @@ export default {
                     </h2>
                     <p class="text-lg text-neutral-500 dark:text-neutral-300">
                         Redefining video downloads for YouTube, Twitter,
-                        Facebook, and Instagram Reels and Photos. Experience
+                        Facebook, TikTok, and Instagram Reels. Experience
                         unparalleled simplicity and speed in one powerful
                         platform!
                     </p>
